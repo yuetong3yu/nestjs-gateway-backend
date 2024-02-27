@@ -12,7 +12,7 @@
 
     <div>
       <input type="text" id="message" />
-      <button onclick="handleSubmitNewMessahe()">submit</button>
+      <button onclick="handleSubmitNewMessage()">submit</button>
     </div>
 
     <script
@@ -21,6 +21,34 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     ></script>
-    <script src="./chat.js"></script>
+    <script>
+      const sokcet = io('http://localhost:3000');
+
+      const messageContainer = document.getElementById('messages');
+      const messageInput = document.getElementById('message');
+
+      const handleSubmitNewMessage = () => {
+        const _newVal = messageInput.value;
+        messageInput.value = '';
+        if (_newVal) {
+          sokcet.emit('message', { data: _newVal });
+        }
+      };
+
+      messageInput.addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+          handleSubmitNewMessage();
+        }
+      });
+
+      sokcet.on('message', ({ data }) => {
+        const li = document.createElement('li');
+        li.innerHTML = data;
+        messageContainer.appendChild(li);
+        messageInput.focus();
+      });
+
+      document.onload = messageInput.focus();
+    </script>
   </body>
 </html>
